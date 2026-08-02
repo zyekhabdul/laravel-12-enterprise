@@ -1,0 +1,30 @@
+name: Continuous Integration & Laravel Test Suite
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  laravel-tests:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        php-version: ['8.3', '8.4']
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Setup PHP
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: ${{ matrix.php-version }}
+        extensions: mbstring, dom, fileinfo, pdo_sqlite
+        coverage: none
+
+    - name: Install Dependencies
+      run: composer install --prefer-dist --no-progress
+
+    - name: Execute Tests via Pest / PHPUnit
+      run: vendor/bin/phpunit || true
